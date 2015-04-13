@@ -1,23 +1,19 @@
 from sklearn.ensemble import RandomForestClassifier as RandomForest
-from sklearn.cross_validation import StratifiedKFold as KFold
-from sklearn.metrics import classification_report
+from sklearn import cross_validation
 from utils import *
 
 # Read data
 X, y = get_train_data("../data/train.csv")
 
-# Run cross validation
-kf = KFold(y, n_folds=8)
-y_pred = y * 0
-fold = 1
-for train, test in kf:
-    X_train, X_test, y_train, y_test = X[train, :], X[test, :], y[train], y[test]
-    clf = RandomForest(n_estimators=100, n_jobs=3)
-    print "Fold %d: fitting" % fold
-    clf.fit(X_train, y_train)
-    print "Fold %d: predicting" % fold
-    y_pred[test] = clf.predict(X_test)
-    fold += 1
+# Parameters to test
+parameter_space = [[340]]
 
-# Show report with accuracy for classes
-print classification_report(y, y_pred, target_names=class_names)
+# Cross validation
+parameter_scores = []
+for parameter in parameter_space:
+    clf = RandomForest(n_estimators=parameter[0], n_jobs=2)  # criterion='entropy'
+    scores = cross_validation.cross_val_score(clf, X, y, cv=6, scoring='log_loss', verbose=3)
+    parameter_scores.append(np.mean(scores * -1))
+
+# Show results
+print "Logloss: " + str(parameter_scores)
