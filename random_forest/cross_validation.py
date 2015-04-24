@@ -6,13 +6,13 @@ from utils import *
 X, y = get_train_data("../data/train.csv")
 
 # Parameters to test
-parameter_space = [[340]]
+parameter_space = [[320], [340], [360], [380], [400]]
 
 # Cross validation
 parameter_scores = []
 for parameter in parameter_space:
     clf = RandomForest(n_estimators=parameter[0], n_jobs=2)  # criterion='entropy'
-    scores = cross_validation.cross_val_score(clf, X, y, cv=6, scoring='log_loss', verbose=3)
+    scores = cross_validation.cross_val_score(clf, X, y, cv=4, scoring='log_loss', verbose=3)
     parameter_scores.append(np.mean(scores * -1))
 
 # Show results

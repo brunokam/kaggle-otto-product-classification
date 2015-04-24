@@ -12,7 +12,7 @@ def get_train_data(path):
     data = data[1:]
     # Create X matrix without first column containing id and last column containing class label
     X = data[:, 1:-1]
-    X = X.astype('int')
+    X = X.astype('float')
     # Create y vector from last column and convert to int
     y = data[:, -1]
     y = np.array([class_names.index(elem) for elem in y])
@@ -27,7 +27,7 @@ def get_test_data(path):
     data = data[1:]
     # Create X matrix without first column containing id
     X = data[:, 1:]
-    X = X.astype('int')
+    X = X.astype('float')
     return X
 
 
