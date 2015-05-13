@@ -32,9 +32,9 @@ def get_test_data(path):
 
 
 # Based on scores matrix write submission to file
-def save_submission(scores):
-    print "Writing submission"
-    with open('submission.csv', 'wb') as submission:
+def save_submission(scores, path):
+    print "Writing submission: %s" % path
+    with open(path, 'wb') as submission:
         # Write description row
         submission.write('id,Class_1,Class_2,Class_3,Class_4,Class_5,Class_6,Class_7,Class_8,Class_9\n')
         for i in xrange(len(scores)):
@@ -43,3 +43,14 @@ def save_submission(scores):
             for elem in scores[i]:
                 submission.write(',' + str(elem))
             submission.write('\n')
+
+
+def get_submission(path):
+    print "Reading submission: %s" % path
+    data = np.array(list(csv.reader(open(path, "rb"), delimiter=',')))
+    # Skip first row with data description
+    data = data[1:]
+    # Create X matrix without first column containing id
+    X = data[:, 1:]
+    X = X.astype('float')
+    return X

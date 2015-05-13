@@ -17,4 +17,4 @@ clf.fit(X_train, y_train)
 predictions = clf.predict_proba(X_test)
 
 # Save submission to file
-save_submission(predictions)
+save_submission(predictions, 'svm.csv')
