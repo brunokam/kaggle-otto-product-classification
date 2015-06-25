@@ -14,15 +14,15 @@ xg_test = xgb.DMatrix(X_test)
 
 # Setup parameters
 param = {'silent': 1, 'nthread': 2, 'objective': 'multi:softprob', 'eval_metric': 'mlogloss', 'num_class': 9,
-         'max_depth': 8, 'eta': 0.3}
-num_round = 90
+         'max_depth': 8, 'eta': 0.02}
+n_rounds = 1450
 watchlist = [(xg_train, 'train')]
 
 # Train
-bst = xgb.train(param, xg_train, num_round, watchlist)
+bst = xgb.train(param, xg_train, n_rounds, watchlist)
 
 # Predict
 y_prob = bst.predict(xg_test).reshape(X_test.shape[0], 9)
 
 # Save submission to file
-save_submission(y_prob, 'xgb.csv')
+save_submission(y_prob, '../submissions/xgb_1450.csv')

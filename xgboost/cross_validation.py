@@ -1,6 +1,5 @@
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.metrics import log_loss
-from sklearn.decomposition import PCA
 from utils import *
 import sys
 
@@ -16,7 +15,7 @@ X, y = get_train_data("../data/train.csv")
 # print "%s: %d features left" % (str(pca), len(pca.explained_variance_ratio_))
 
 # Parameters space creation
-params = [[8], [0.3]]
+params = [[8], [0.02]]
 params_space = []
 for i in xrange(len(params[0])):
     for j in xrange(len(params[1])):
@@ -24,11 +23,13 @@ for i in xrange(len(params[0])):
 
 # Grid search
 grid_errors = []
+grid_best_iterations = []
 for params in params_space:
 
     # Cross validation
-    skf = StratifiedKFold(y, 4)
+    skf = StratifiedKFold(y, 10)
     errors = []
+    best_iterations = []
     for train, test in skf:
         train_X = X[train]
         train_Y = y[train]
@@ -39,19 +40,22 @@ for params in params_space:
 
         # Setup parameters
         param = {'silent': 1, 'nthread': 2, 'objective': 'multi:softprob', 'eval_metric': 'mlogloss', 'num_class': 9,
-                 'max_depth': params[0], 'eta': params[1]}
-        num_round = 60
+                 'max_depth': params[0], 'eta': params[1]}  # , 'subsample': 0.5
+        n_rounds = 4000  # Just a big number to trigger early stopping and best iteration
 
         # Train
-        bst = xgb.train(param, xg_train, num_round, [(xg_train, 'train'), (xg_test, 'test')])
+        bst = xgb.train(param, xg_train, n_rounds, [(xg_train, 'train'), (xg_test, 'test')], early_stopping_rounds=20)
         # Predict
         predictions = bst.predict(xg_test).reshape(test_Y.shape[0], 9)
-        # Get error
+        # Get error and best iteration
         errors.append(log_loss(test_Y, predictions))
+        best_iterations.append(bst.best_iteration)
 
     # Append new grid error
     grid_errors.append(np.mean(errors))
+    grid_best_iterations.append(list(best_iterations))
 
 # Show results
 for i in xrange(len(params_space)):
-    print "Params: %s, logloss: %f" % (str(params_space[i]), grid_errors[i])
+    print "Params: %s, logloss: %f, best iterations: %s, mean: %f" % (
+        str(params_space[i]), grid_errors[i], str(grid_best_iterations[i]), np.mean(grid_best_iterations[i]))
