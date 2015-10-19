@@ -1,4 +1,3 @@
-# kaggle-otto-product-classification
+# Kaggle - Otto Product Classification
 
-Kaggle competition Otto Product Classification.
 Approach: Random Forest, SVM, XGBoost
